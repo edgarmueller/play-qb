@@ -3,7 +3,7 @@ package domain
 import org.qbproject.schema.QBSchema._
 import org.qbproject.mongo._
 import play.api.libs.json.JsBoolean
-import view.QBView._
+import QBView._
 
 object Schemas {
 
@@ -25,32 +25,37 @@ object Schemas {
   val viewModelEntryPoint = QBViewModel(
     qbList(user),
     QBVerticalLayout(
-      QBDerefTable(
-        QBViewPath("", "/user"),
+      QBScopedTable(
+        QBViewPath("", Some(QBEndPoint("/user"))),
         QBReferenceColumnMapping("id", "Name"), // TODO: replace QBReferenceColumnMapping with annotation on respective column
+        Map(
+          TableOptions.EnableFiltering -> "false",
+          TableOptions.PagingBaseUrl   -> "/user/search"
+        ),
         QBTableColumn(QBViewPath("name"),    "Name"),
         QBTableColumn(QBViewPath("status"),     "Status")
       )
     )
   )
 
-  // fetche
   val viewUser = QBViewModel(
     user,
     QBVerticalLayout(
       QBHorizontalLayout(
         QBViewControl(QBViewPath("name"), "Name"),
-        QBViewControl(QBViewPath("status"), "Status"),
-        QBDerefTable(
-          QBViewPath("tasks",   // the attribute that contains a list of task ids
+        QBViewControl(QBViewPath("status"), "Status")
+      ),
+      QBScopedTable(            // resolves all IDs contained within the property of the currently scoped element
+        QBViewPath("tasks",     // the attribute that contains a list of task IDs
+          Some(QBEndPoint(      // endpoint from where to fetch the referenced entities
             endPoint = "/task", // the endpoint where to fetch tasks from
-            endPointParam = "/search?userId={{id}}"), // and search parameters that are necessary to filter the fetched tasks
-          QBReferenceColumnMapping("id", "Title"),
-          QBTableColumn(QBViewPath("title"),    "Title"),
-          QBTableColumn(QBViewPath("done"),     "Done"),
-          QBTableColumn(QBViewPath("priority"), "Priority"),
-          QBTableColumn(QBViewPath("dueDate"),  "Due Date")
-        )
+            endPointParam = "/search?userId={{id}}"))), // any necessary search parameters
+        QBReferenceColumnMapping("id", "Title"),        // defines which column will act
+        Map(TableOptions.PagingBaseUrl -> "/task/search?userId={{id}}"),
+        QBTableColumn(QBViewPath("title"),    "Title"),
+        QBTableColumn(QBViewPath("done"),     "Done"),
+        QBTableColumn(QBViewPath("priority"), "Priority"),
+        QBTableColumn(QBViewPath("dueDate"),  "Due Date")
       )
     )
   )

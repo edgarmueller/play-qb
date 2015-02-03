@@ -255,20 +255,6 @@ function getRawInstanceData($http, $q, dataUrl, id) {
     return defer.promise;
 }
 
-function getRawInstanceDataByPost($http, $q, dataUrl, ids) {
-    var defer = $q.defer();
-    var dataPromise = $http.post(dataUrl, { "fetch" : ids });
-
-    $q.all([dataPromise]).then(function(values) {
-        var result;
-        var rawInstanceData = values[0].data;
-        result = rawInstanceData;
-        defer.resolve(result);
-    });
-
-    return defer.promise;
-}
-
 function getRawModelData($http, $q, modelUrl) {
     var defer = $q.defer();
 
@@ -294,10 +280,12 @@ function buildTableControlObject() {
     };
     return tObject;
 }
-function initTable(data, tableUiElement, element) {
+function initTable(data, tableUiElement) {
+
     for (var h = 0; h < data[0].length; h++) {
 
         tableUiElement.tableOptions.gridOptions.totalItems = data[0].length;
+        console.log("totalItems are " + data[0].length);
         var d = data[0][h];
 
         if (tableUiElement.tableOptions.gridOptions.data.length < tableUiElement.tableOptions.pagingOptions.pageSize) {
@@ -307,16 +295,16 @@ function initTable(data, tableUiElement, element) {
         }
     }
 }
-function createTableCallbacks(url, tableUiElement, $scope, $http) {
+function createTableCallbacks(url, pagingUrl, tableUiElement, $scope, $http) {
     return function (gridApi) {
         gridApi.paging.on.pagingChanged($scope, function (pageNumber, pageSize) {
             var pagingOptions = tableUiElement.tableOptions.pagingOptions;
             pagingOptions.pageNumber = pageNumber;
             pagingOptions.pageSize = pageSize;
             var separator = url.indexOf("?") > -1 ? "&" : "?";
-            $http.get(url + separator + "page=" + (pagingOptions.pageNumber - 1) + "&pageSize=" + pagingOptions.pageSize).success(function (newdata) {
-                console.log(pageNumber);
-                console.log($scope);
+            $http.get(pagingUrl + separator + "page=" + (pagingOptions.pageNumber - 1) + "&pageSize=" + pagingOptions.pageSize).success(function (newdata) {
+                console.log(pagingUrl + separator + "page=" + (pagingOptions.pageNumber - 1) + "&pageSize=" + pagingOptions.pageSize);
+                console.log(newdata);
                 tableUiElement.tableOptions.gridOptions.data = newdata;
             });
         });
@@ -429,7 +417,7 @@ function buildLayoutTree($http, $q, $scope, model, layout, instance, bindings, u
             //    bindings[tableUiElement.name] = tableUiElement.value;
 
             ////////////////////////////
-        } else if (element.type === "DerefTable") {
+        } else if (element.type === "QBScopedTable") {
 
             var endPoint = element.endPoint;
             var endPointParam = element.endPointParam;
@@ -438,18 +426,23 @@ function buildLayoutTree($http, $q, $scope, model, layout, instance, bindings, u
             }
 
             var url = urlMap["baseUrl"]  + endPoint + endPointParam;
+            var pagingUrl = urlMap["baseUrl"] + element.options["pagingUrl"];
+            if (pagingUrl.indexOf("{{id}}") > -1) {
+                pagingUrl= pagingUrl.replace("{{id}}", instance.id)
+            }
+            console.log("Paging URL is " + pagingUrl);
 
             var tObject = buildTableControlObject();
             var tableUiElement = buildTableUIElement(element, {type: "multi-reference"}, $http, url);
 
-            tableUiElement.tableOptions.gridOptions.onRegisterApi = createTableCallbacks(url, tableUiElement, $scope, $http)
+            tableUiElement.tableOptions.gridOptions.onRegisterApi = createTableCallbacks(url, pagingUrl, tableUiElement, $scope, $http)
             tObject.elements.push(tableUiElement);
             bindings[tableUiElement.id] = tableUiElement.value;
             result.push(tObject);
 
             var promise = getRawInstanceData($http, $q, url);
             $q.all([promise]).then(function(data) {
-                initTable(data, tableUiElement, element);
+                initTable(data, tableUiElement);
             });
 
         } else if (element.type === "Label") {
@@ -588,7 +581,7 @@ function getUIElement(displayName, path, type, value) {
     return data;
 }
 
-function buildTableUIElement(element, type) {
+function buildTableUIElement(element, type, totalItems) {
     var pagingOptions = {
         pageNumber: 1,
         pageSize: 5,
@@ -611,9 +604,10 @@ function buildTableUIElement(element, type) {
             }],
             data: [],
             useExternalPaging: true,
-            enableFiltering: true,
+            enableFiltering: element.options.hasOwnProperty("enableFiltering") ? element.options["enableFiltering"] : true,
             useExternalFiltering: true,
-            totalItems: 10 // TODO :replace with count form REST api
+            minRowsToShow: pagingOptions.pageSize + 1,
+            totalItems: totalItems
         }
     };
 

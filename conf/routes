@@ -4,15 +4,11 @@
 
 # Users API --
 
-OPTIONS /user/:id                 controllers.UserController.allowCrossOrigin(id)
-
 GET     /user/model               controllers.UserController.schema()
-
 GET     /user/view                controllers.UserController.view()
 GET     /user/view/:id            controllers.UserController.viewPerUser(id)
 
 GET     /user/search              controllers.UserController.find(name: Option[String], status: Option[String], page: Int ?= 0, pageSize: Int ?= 10)
-
 ->      /user                     controllers.UserRouter
 
 # Tasks API --
@@ -20,13 +16,15 @@ GET     /user/search              controllers.UserController.find(name: Option[S
 GET     /task/model               controllers.TaskController.schema()
 GET     /task/view                controllers.TaskController.view()
 GET     /task/view/:id            controllers.TaskController.viewPerTask(id)
+
 GET     /task/search              controllers.TaskController.findTasksByUser(userId: String, title: Option[String], done: Option[Boolean], priority: Option[Int], page: Int ?= 0, pageSize: Int ?= 10)
 GET     /task                     controllers.TaskController.list(page: Int ?= 0, pageSize: Int ?= 10, includeMeta: Boolean ?= false)
 ->      /task                     controllers.TaskRouter
 
+
 GET     /                         controllers.Application.index()
 GET     /server                   controllers.Application.serverIndex()
 
-# Map static resources from the /public folder to the /assets URL path
+# Map static resources
 GET     /*file             controllers.Assets.at(path="/public/app", file)
 

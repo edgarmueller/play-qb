@@ -19,17 +19,19 @@
     <script src='@routes.Assets.at("bower_components/angular-route/angular-route.js")'></script>
     <script src='@routes.Assets.at("bower_components/angular-ui/build/angular-ui.js")'></script>
     <script src='@routes.Assets.at("bower_components/angular-ui-grid/ui-grid.js")'></script>
+    <script src='@routes.Assets.at("bower_components/underscore/underscore-min.js")'></script>
 
-    <script src='@routes.Assets.at("js/app.js")'                     type="text/javascript"></script>
-    <script src='@routes.Assets.at("js/services.js")'                type="text/javascript"></script>
-    <script src='@routes.Assets.at("js/controllers.js")'             type="text/javascript"></script>
+    <script src='@routes.Assets.at("js/underscore-module.js")'        type="text/javascript"></script>
+    <script src='@routes.Assets.at("js/app.js")'                      type="text/javascript"></script>
+    <script src='@routes.Assets.at("js/services.js")'                 type="text/javascript"></script>
+    <script src='@routes.Assets.at("js/controllers.js")'              type="text/javascript"></script>
     <script src='@routes.Assets.at("js/directives.js")'               type="text/javascript"></script>
     <script src='@routes.Assets.at("js/jquery.min.js")'               type="text/javascript"></script>
     <script src='@routes.Assets.at("js/ui-bootstrap-tpls-0.11.2.js")' type="text/javascript"></script>
     <script src='@routes.Assets.at("js/ui-utils.js")'                 type="text/javascript"></script>
 
 </head>
-<body ng-app="qbForms">
+<body>
 <div class="container">
   <div class="header">
     <nav>
@@ -64,27 +66,26 @@
   </div>
 
   <div class="row">
-    <div class="row">
-      <h2>Examples </h2>
-    </div>
-    <div class="row">
-      <div class="col-sm-6">
-        <p><a class="btn btn-md btn-success" href="/server#/user" role="button">Server Example</a></p>
-        <p>Discover Paging and TableControls when this site is hosted by a QB-PlayApplication.</p>
+    <h4>Check it out! </h4>
+    <p><a class="btn btn-md btn-success" href="/server/#/user" role="button">Server Example</a></p>
+    <div ng-app="qbForms">
+      <p><a class="btn btn-md btn-success" href="#/localdemo" role="button">Local Example</a></p>
+      <div class="row top-buffer">
+        <div class="col-sm-8 col-sm-offset-2">
+          <div ng-view class="bootstrap-qbwrapper"/>
+        </div>
       </div>
+    </div>
 
-      <div class="col-sm-6">
-        <p><a class="btn btn-md btn-success" href="#/localdemo" role="button">Local Example</a></p>
-        <p>Manually manipulate JSON Schema and QB View Models to generate any form you want.</p>
-      </div>
-    </div>
   </div>
 
   <div class="row top-buffer">
     <div class="col-sm-8 col-sm-offset-2">
       <div ng-view class="bootstrap-qbwrapper"/>
     </div>
+
   </div>
+
 
   <div class ="row">
     <footer class="footer col-sm-12">

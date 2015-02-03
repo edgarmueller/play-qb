@@ -128,13 +128,6 @@ trait QbCrudController extends Controller {
     implicit val format: Format[QBAPIStatusMessage] = Json.format[QBAPIStatusMessage]
   }
 
-
-  def allowCrossOrigin(id: String) = Action { implicit request =>
-    Ok("blub").withHeaders("Access-Control-Allow-Origin" -> "*", "Access-Control-Allow-Methods" -> "POST",
-      "Access-Control-Max-Age" -> "300", "Access-Control-Allow-Headers" -> "Origin, X-Requested-With, Content-Type, Accept"
-    )
-  }
-
   /**
    * Set json headers, so that api calls aren't cached. Especially a problem with IE.
    */

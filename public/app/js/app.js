@@ -10,7 +10,8 @@ angular.module('qbForms', [
     'qbForms.controllers',
     'qbForms.utilityServices',
     'qbForms.dataServices',
-    'qbForms.directives'
+    'qbForms.directives',
+    'underscore'
 ]).
 config(['$routeProvider',
     function($routeProvider) {
